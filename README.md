@@ -1,5 +1,3 @@
 # Game Of Life
 
-## TODOS:
-- Auto run and pause
-- Display generations
+https://www.freecodecamp.org/challenges/build-the-game-of-life
