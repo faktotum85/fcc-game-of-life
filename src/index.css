@@ -8,16 +8,20 @@ body {
   margin: 10px;
 }
 
+h1 {
+  text-align: center;
+}
+
 .board {
   margin: auto;
-  width: 200px;
+  width: 300px;
   display: flex;
   flex-wrap: wrap;
 }
 
 .cell {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   border: 1px solid black;
   box-sizing: border-box;
 }
@@ -26,7 +30,9 @@ body {
   background-color: red;
 }
 
-.options {
-  width: 200px;
+.options, .generation {
+  width: 300px;
   margin: 20px auto;
+  display: flex;
+  justify-content: space-around;
 }

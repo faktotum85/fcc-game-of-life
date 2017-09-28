@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import Gameboard from './Gameboard';
 import Options from './Options';
+import Generation from './Generation';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
       board: {
-        height: 10,
-        width: 10
+        height: 20,
+        width: 20
       },
-      cells: []
+      cells: [],
+      generation: 0
     }
 
     this.setCells = this.setCells.bind(this);
@@ -18,21 +20,41 @@ class App extends Component {
     this.runTurn = this.runTurn.bind(this);
     this.clearBoard = this.clearBoard.bind(this);
     this.randomBoard = this.randomBoard.bind(this);
+    this.toggleRunning = this.toggleRunning.bind(this);
+    this.stop = this.stop.bind(this);
   }
 
   componentWillMount() {
     this.setCells(true);
+    const intervalId = setInterval(this.runTurn, 100);
+    this.setState({
+      turnTimer: intervalId
+    });
   }
 
   clearBoard() {
+    this.stop();
     this.setCells(false);
   }
 
+  stop() {
+    let intervalId = this.state.turnTimer;
+    if (intervalId) {
+      intervalId = clearInterval(intervalId);
+      this.setState({
+        turnTimer: intervalId
+      });
+    }
+  }
+
   randomBoard() {
+    this.stop();
     this.setCells(true);
   }
 
   setCells(random=false) { // call with random=true to generate random board;
+    this.setState({generation: 0}); //reset generation count;
+
     const cells = [];
     const width = this.state.board.width;
     const height = this.state.board.height;
@@ -60,14 +82,14 @@ class App extends Component {
       let rows = [row - 1 >= 0 ? row - 1 : height - 1, row, row + 1 < height ? row + 1 : 0];
 
       let cell;
-      for (let c of cols) {
-        for (let r of rows) {
+      cols.forEach((c) => {
+        rows.forEach((r) => {
           cell = c + r * width;
           if (cell !== i) {
             neighbors.push(cell);
           }
-        }
-      }
+        })
+      })
       return neighbors;
     }
   }
@@ -109,14 +131,38 @@ class App extends Component {
       cell.alive=cell.next;
     });
     // update state
-    this.setState({cells});
+    this.setState({
+      cells,
+      generation: this.state.generation + 1
+    });
+  }
+
+  toggleRunning() {
+    let intervalId = this.state.turnTimer;
+    if (intervalId) {
+      this.stop();
+    } else {
+      intervalId = setInterval(this.runTurn, 100);
+      this.setState({
+        turnTimer: intervalId
+      });
+    }
   }
 
   render() {
     return (
       <div>
+        <h1>Game of Life</h1>
         <Gameboard board={this.state.board} cells={this.state.cells} toggleAlive={this.toggleAlive}></Gameboard>
-        <Options runTurn={this.runTurn} clearBoard={this.clearBoard} randomBoard={this.randomBoard}></Options>
+        <Options
+          runTurn={this.runTurn}
+          clearBoard={this.clearBoard}
+          randomBoard={this.randomBoard}
+          running={this.state.turnTimer}
+          toggleRunning={this.toggleRunning}>
+        </Options>
+        <Generation generation={this.state.generation}></Generation>
+
       </div>
     );
   }
